@@ -231,6 +231,59 @@ def admin_get_all_users():
     finally:
         conn.close()
 
+@app.route("/api/admin/level", methods=['GET'])
+def admin_level():
+    user = get_current_user_from_request()
+    if not user:
+        return jsonify({"error":"未登入 or token 無效"}),401
+    
+    if user['level'] != "admin":
+        return jsonify({"error":"權限不足!"}),403
+    conn = get_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT level, COUNT(*) AS count FROM member GROUP BY level")
+            rows = cursor.fetchall()
+            return jsonify({"data":rows,"message":"會員資料"})
+    finally:
+        conn.close()
+
+@app.route("/api/admin/city", methods=['GET'])
+def admin_city():
+    user = get_current_user_from_request()
+    if not user:
+        return jsonify({"error":"未登入 or token 無效"}),401
+    
+    if user['level'] != "admin":
+        return jsonify({"error":"權限不足!"}),403
+    
+    conn = get_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT city , COUNT(*) AS count FROM member GROUP BY city")
+            rows = cursor.fetchall()
+            return jsonify({"data":rows, "message":"會員居住地"})
+    finally:
+        conn.close()
+
+@app.route("/api/admin/edu", methods=['GET'])
+def admin_edu():
+    user = get_current_user_from_request()
+    if not user:
+        return jsonify({"error":"未登入 or token無效"}),401
+    
+    if user['level'] != "admin":
+        return jsonify({"error":"權限不足"}),403
+    
+    conn = get_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT edu, COUNT(*) AS count FROM member GROUP BY edu")
+            rows = cursor.fetchall()
+            return jsonify({"data":rows, "message":"會員學歷"})
+    finally:
+        conn.close()
+
 
 @app.route("/api/ping")
 def ping():
