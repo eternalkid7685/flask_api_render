@@ -250,8 +250,13 @@ def admin_level():
 
 @app.route("/api/admin/city", methods=['GET'])
 def admin_city():
+    print("A: enter admin_city")
+
     user = get_current_user_from_request()
+    print("B: user =", user)
+
     if not user:
+        print("C: user is None")
         return jsonify({"error":"未登入 or token 無效"}),401
     
     if user['level'] != "admin":
